@@ -10,5 +10,5 @@ createRoot(document.getElementById('root')!).render(
     <QuioscoProvider>
       <RouterProvider router={router} />
     </QuioscoProvider>
-  </StrictMode>
+  </StrictMode>,
 )
