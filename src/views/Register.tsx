@@ -1,41 +1,30 @@
 import { createRef, useState } from "react";
 import { Link } from "react-router-dom";
-import clienteAxios from "../config/axios";
 import Alerta from "../components/AuthLayout/Alerta";
-import { RegisterResponseSchema } from "../Types";
-import { isAxiosError } from "axios";
-
+import { useAuth } from "../hooks/useAuth";
 
 export default function Register() {
     const nameRef = createRef<HTMLInputElement>();
     const emailRef = createRef<HTMLInputElement>();
     const passwordRef = createRef<HTMLInputElement>();
     const passwordConfirmationRef = createRef<HTMLInputElement>();
+    const { register } = useAuth({ middleware: 'guest', url: '/' });
 
-    const [errores, setErrores] = useState<string[]>([])
+    const [errores, setErrores] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setLoading(true);
 
         const datos = {
             name: nameRef.current?.value,
             email: emailRef.current?.value,
             password: passwordRef.current?.value,
             password_confirmation: passwordConfirmationRef.current?.value
-
-        }
-
-        try {
-            const { data } = await clienteAxios.post('/register', datos);
-            const parsed = RegisterResponseSchema.parse(data);
-            console.log(parsed.token);
-
-        } catch (error) {
-            if (isAxiosError(error) && error.response) {
-                setErrores(Object.values(error.response.data.errors));
-            }
-        }
-    }
+        };
+        await register({ datos, setErrores, setLoading });
+    };
 
     return (
         <>
@@ -95,9 +84,23 @@ export default function Register() {
                             ref={passwordConfirmationRef} />
                     </div>
 
-                    <input type="submit"
-                        value="Crear Cuenta"
-                        className="bg-indigo-600 hover:bg-indigo-800 text-white w-full mt-5 p-3 uppercase font-bold cursor-pointer transition-colors" />
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`bg-indigo-600 hover:bg-indigo-800 text-white w-full mt-5 p-3 uppercase font-bold cursor-pointer transition-colors flex items-center justify-center ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {loading ? (
+                            <>
+                                <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                </svg>
+                                Creando...
+                            </>
+                        ) : (
+                            "Crear Cuenta"
+                        )}
+                    </button>
                 </form>
             </div>
 
@@ -113,7 +116,6 @@ export default function Register() {
                     className="flex gap-1 text-center my-5 group text-slate-500 hover:text-slate-600  text-sm transition-colors">
                     Olvidé mi
                     <p className="group text-orange-600 group-hover:text-orange-700 transition-colors">
-
                         password
                     </p>
                 </Link>

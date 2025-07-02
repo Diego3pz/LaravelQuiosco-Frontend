@@ -15,6 +15,7 @@ interface QuioscoContextType {
     handleAgregarPedido: (producto: ProductoPedido) => void;
     handleEditarCantidad: (id: number) => void;
     handleEliminarProductoPedido: (id: number) => void;
+    handleSubmitNuevaOrden: ({ logout }: { logout: () => void }) => Promise<void>;
     modal: boolean;
 }
 
@@ -34,7 +35,8 @@ const QuioscoContext = createContext<QuioscoContextType>({
     handleEditarCantidad: () => { },
     handleClickModal: () => { },
     handleAgregarPedido: () => { },
-    handleEliminarProductoPedido: () => { }
+    handleEliminarProductoPedido: () => { },
+    handleSubmitNuevaOrden: async () => { },
 });
 
 const QuioscoProvider = ({ children }: QuioscoProviderProps) => {
@@ -101,6 +103,39 @@ const QuioscoProvider = ({ children }: QuioscoProviderProps) => {
         toast.success('Eliminado del pedido')
     }
 
+    const handleSubmitNuevaOrden = async ({ logout }: { logout: () => void }) => {
+        const token = localStorage.getItem('AUTH_TOKEN')
+        try {
+            const { data } = await clienteAxios.post('/orders', {
+                total,
+                productos: pedido.map(producto => {
+                    return {
+                        id: producto.id,
+                        cantidad: producto.cantidad
+                    }
+                })
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            toast.success(data.message);
+            setTimeout(() => {
+                setPedido([]);
+            }, 100);
+
+            // Cerrar sesión del usuario
+            setTimeout(() => {
+                localStorage.removeItem('AUTH_TOKEN');
+                logout();
+            }, 3000)
+
+        } catch (error) {
+            console.log(error);
+
+        }
+    }
+
     return (
         <QuioscoContext.Provider value={{
             categorias,
@@ -114,7 +149,8 @@ const QuioscoProvider = ({ children }: QuioscoProviderProps) => {
             handleClickModal,
             handleAgregarPedido,
             handleEditarCantidad,
-            handleEliminarProductoPedido
+            handleEliminarProductoPedido,
+            handleSubmitNuevaOrden
         }}>
             {children}
         </QuioscoContext.Provider>

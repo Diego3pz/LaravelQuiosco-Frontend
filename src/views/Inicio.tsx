@@ -22,8 +22,6 @@ export default function Inicio() {
     (producto) => producto.categories_id === (categoriaActual as Categoria).id
   );
 
-  console.log(productosFiltrados);
-
   return (
     <>
       <h1 className=" text-4xl font-black">
