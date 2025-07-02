@@ -15,7 +15,7 @@ export const ProductoSchema = z.object({
     nombre: z.string(),
     precio: z.number(),
     imagen: z.string(),
-    categoria_id: z.number(),
+    categories_id: z.number(),
     id: z.number(),
 });
 
@@ -26,3 +26,23 @@ export const ProductoPedidoSchema = ProductoSchema.extend({
 });
 
 export type ProductoPedido = z.infer<typeof ProductoPedidoSchema>;
+
+// User
+
+export const UserSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    email: z.string(),
+});
+
+export const RegisterResponseSchema = z.object({
+    token: z.string(),
+    user: UserSchema,
+});
+
+export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
+export const ErrorResponseSchema = z.object({
+    message: z.string(),
+    errors: z.record(z.array(z.string())),
+});
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
