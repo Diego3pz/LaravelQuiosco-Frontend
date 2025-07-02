@@ -1,12 +1,10 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
 import type { Categoria, Producto, ProductoPedido } from "../Types";
-import { categorias as categoriasDB } from "../data/categories";
-import { productos as productosDB } from "../data/products";
 import { toast } from "react-toastify";
+import clienteAxios from "../config/axios";
 
 interface QuioscoContextType {
-    categorias: Categoria[];
-    productos: Producto[];
+    categorias: Categoria[];      // <-- Agrega esto
     producto: Producto;
     pedido: ProductoPedido[];
     categoriaActual: Categoria;
@@ -26,10 +24,9 @@ interface QuioscoProviderProps {
 
 const QuioscoContext = createContext<QuioscoContextType>({
     categorias: [],
-    productos: [],
     pedido: [],
     producto: {} as Producto,
-    categoriaActual: categoriasDB[0],
+    categoriaActual: {} as Categoria,
     modal: false,
     total: 0,
     handleSetProducto: () => { },
@@ -41,18 +38,32 @@ const QuioscoContext = createContext<QuioscoContextType>({
 });
 
 const QuioscoProvider = ({ children }: QuioscoProviderProps) => {
-    const [categorias] = useState(categoriasDB);
-    const [categoriaActual, setCategoriaActual] = useState(categorias[0]);
+    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const [categoriaActual, setCategoriaActual] = useState({} as Categoria);
     const [producto, setProducto] = useState<Producto>({} as Producto);
-    const [productos] = useState(productosDB);
     const [modal, setModal] = useState(false);
     const [pedido, setPedido] = useState<ProductoPedido[]>([]);
-    const [total, setTotal] = useState(0)
+    const [total, setTotal] = useState(0);
+
 
     useEffect(() => {
         const nuevoTotal = pedido.reduce((total, producto) => (producto.precio * producto.cantidad) + total, 0)
         setTotal(nuevoTotal)
     }, [pedido])
+
+    const getCategories = async () => {
+        try {
+            const { data } = await clienteAxios.get("/categories");
+            setCategorias(data.data)
+            setCategoriaActual(data.data[0]);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        getCategories();
+    }, [])
 
     const handleClickCategoria = (id: number) => {
         const categoria = categorias.filter(cat => cat.id === id)[0];
@@ -94,8 +105,7 @@ const QuioscoProvider = ({ children }: QuioscoProviderProps) => {
         <QuioscoContext.Provider value={{
             categorias,
             categoriaActual,
-            handleClickCategoria,
-            productos,
+            handleClickCategoria,     // <-- Agrega esto
             producto,
             handleSetProducto,
             modal,
