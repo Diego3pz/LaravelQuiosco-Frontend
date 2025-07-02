@@ -1,15 +1,46 @@
 import { Link } from "react-router-dom";
+import { createRef, useState } from "react";
+import Alerta from "../components/AuthLayout/Alerta";
+import { useAuth } from "../hooks/useAuth";
 
 
 export default function Login() {
+    const emailRef = createRef<HTMLInputElement>();
+    const passwordRef = createRef<HTMLInputElement>();
+
+    const [errores, setErrores] = useState<string[]>([])
+
+    const { login } = useAuth({
+        middleware: 'guest',
+        url: '/',
+    });
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const datos = {
+            email: emailRef.current?.value,
+            password: passwordRef.current?.value
+        }
+
+        login({datos, setErrores})
+
+    }
+
+    console.log(errores);
+
+
     return (
         <>
             <div className="text-4xl font-black">Iniciar Sesión</div>
             <p>Para crear un pedido debes iniciar sesión</p>
 
             <div className="bg-white shadow-md rounded-md  px-5 py-10">
-                <form>
-
+                <form
+                    onSubmit={handleSubmit}
+                    noValidate
+                >
+                    {errores ? errores.map((error, i) => <Alerta key={i}>{error}</Alerta>) : null}
                     <div className="mb-4">
                         <label className="text-slate-800"
                             htmlFor="email">
@@ -18,7 +49,8 @@ export default function Login() {
                         <input type="email" id="email"
                             className="mt-2 w-full p-3 bg-gray-50"
                             name="email"
-                            placeholder="Tu Email" />
+                            placeholder="Tu Email"
+                            ref={emailRef} />
                     </div>
 
                     <div className="mb-4">
@@ -29,7 +61,8 @@ export default function Login() {
                         <input type="password" id="password"
                             className="mt-2 w-full p-3 bg-gray-50"
                             name="password"
-                            placeholder="Tu Password" />
+                            placeholder="Tu Password"
+                            ref={passwordRef} />
                     </div>
 
 
