@@ -84,10 +84,25 @@ export const useAuth = ({ middleware, url }: UseAuthParams) => {
     }
 
     useEffect(() => {
-        if (isLoading) return; // Espera a que termine la validación
+        if (isLoading) return;
+
         if (middleware === 'guest' && user) {
-            navigate(url, { replace: true });
+            if (user.admin) {
+                navigate('/admin', { replace: true });
+            } else {
+                navigate(url, { replace: true });
+            }
         }
+
+        if (middleware === 'admin' && user && !user.admin) {
+            navigate('/', { replace: true });
+        }
+
+        // Evita que el admin ingrese a la página principal
+        if (middleware === 'auth' && user && user.admin) {
+            navigate('/admin', { replace: true });
+        }
+
         if (middleware === 'auth' && error) {
             navigate('/auth/login', { replace: true });
         }

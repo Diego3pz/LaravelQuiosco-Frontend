@@ -23,7 +23,7 @@ ReactModal.setAppElement("#root");
 
 export default function Layout() {
   const { modal } = useQuiosco();
-  const { user, error } = useAuth({ middleware: 'auth', url: '/' });
+  useAuth({ middleware: 'auth', url: '/' });
 
   return (
     <>

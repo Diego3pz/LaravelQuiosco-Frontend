@@ -9,7 +9,13 @@ export default function Inicio() {
 
   const { categoriaActual } = useQuiosco();
 
-  const fetcher = () => clienteAxios.get('/products').then(res => res.data.data);
+  const token = localStorage.getItem('AUTH_TOKEN');
+
+  const fetcher = () => clienteAxios.get('/products', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }).then(res => res.data.data);
   const { data, isLoading } = useSWR('/products', fetcher, {
     refreshInterval: 1000
   });
@@ -34,7 +40,7 @@ export default function Inicio() {
 
       <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
         {productosFiltrados.map(producto => (
-          <Producto key={producto.id} producto={producto} />
+          <Producto key={producto.id} producto={producto} botonAgregar={true} />
         ))}
       </div>
     </>
