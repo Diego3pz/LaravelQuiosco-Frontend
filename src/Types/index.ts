@@ -46,3 +46,32 @@ export const ErrorResponseSchema = z.object({
     errors: z.record(z.array(z.string())),
 });
 export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+
+export type OrderProductPivot = {
+    cantidad: number;
+};
+
+export type OrderProduct = {
+    id: number;
+    nombre: string;
+    pivot: OrderProductPivot;
+};
+
+export type OrderUser = {
+    id: number;
+    name: string;
+    email: string;
+};
+
+export type Order = {
+    id: number;
+    total: number;
+    user: OrderUser;
+    products: OrderProduct[];
+};
+
+// Para la respuesta paginada de la API
+export type OrdersApiResponse = {
+    data: Order[];
+    // Puedes agregar más campos si tu paginación los incluye (links, meta, etc.)
+};
