@@ -2,6 +2,7 @@ import useSWR from "swr";
 import clienteAxios from "../config/axios";
 import { formatCurrency } from "../helpers";
 import useQuiosco from "../hooks/useQuiosco";
+import type { OrdersApiResponse, Order, OrderProduct } from "../Types";
 
 
 export default function Orders() {
@@ -13,10 +14,10 @@ export default function Orders() {
         headers: {
             Authorization: `Bearer ${token}`
         }
-    })
+    }).then(res => res.data);
 
-    const { data, isLoading } = useSWR(url, fetcher, {
-        refreshInterval:1000
+    const { data, isLoading } = useSWR<OrdersApiResponse>(url, fetcher, {
+        refreshInterval: 1000
     });
 
     if (isLoading) {
@@ -34,15 +35,15 @@ export default function Orders() {
             </p>
 
             <div className="grid grid-cols-2 gap-5">
-                {data.data.data.map((order: any) => (
+                {data.data.map((order: Order) => (
                     <div key={order.id} className="border-b p-5 bg-white space-y-2">
                         <p className=" text-xl font-bold text-slate-600">Contenido del pedido:</p>
-                        {order.products.map((products: any) => (
-                            <div key={products.id} className="border-b border-slate-200 last-of-type:border-none py-4">
-                                <p>{products.nombre}</p>
+                        {order.products.map((product: OrderProduct) => (
+                            <div key={product.id} className="border-b border-slate-200 last-of-type:border-none py-4">
+                                <p>{product.nombre}</p>
                                 <p>
                                     Cantidad : {' '}
-                                    <span className="font-bold">{products.pivot.cantidad}</span>
+                                    <span className="font-bold">{product.pivot.cantidad}</span>
                                 </p>
                             </div>
                         ))}
