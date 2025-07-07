@@ -12,12 +12,12 @@ export default function ModalProduct() {
     useEffect(() => {
         if (pedido.some((pedidoState) => pedidoState.id === producto.id)) {
             const productoRepetido = pedido.filter((pedidoState) => pedidoState.id === producto.id)[0];
-            setCantidad(productoRepetido.cantidad );
+            setCantidad(productoRepetido.cantidad);
             setEditando(true);
         } else {
             setCantidad(1);
         }
-    }, [pedido])
+    }, [pedido, producto.id])
 
 
     return (
