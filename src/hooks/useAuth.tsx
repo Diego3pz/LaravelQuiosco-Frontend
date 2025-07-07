@@ -98,7 +98,6 @@ export const useAuth = ({ middleware, url }: UseAuthParams) => {
             navigate('/', { replace: true });
         }
 
-        // Evita que el admin ingrese a la página principal
         if (middleware === 'auth' && user && user.admin) {
             navigate('/admin', { replace: true });
         }
@@ -106,7 +105,7 @@ export const useAuth = ({ middleware, url }: UseAuthParams) => {
         if (middleware === 'auth' && error) {
             navigate('/auth/login', { replace: true });
         }
-    }, [user, error, isLoading]);
+    }, [user, error, isLoading, middleware, navigate, url]);
 
     return {
         user,
